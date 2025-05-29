@@ -22,3 +22,18 @@ COPY --from=build /app/target/*.jar app.jar
 
 # Run the jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Start from OpenJDK base image
+FROM openjdk:17-jdk-slim
+
+# Set work directory
+WORKDIR /app
+
+# Copy the project files
+COPY . .
+
+# Build the project
+RUN ./mvnw clean install
+
+# Run the application
+CMD ["java", "-jar", "target/mhetre-kitchen-backend-0.0.1-SNAPSHOT.jar"]
