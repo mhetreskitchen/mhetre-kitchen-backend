@@ -18,6 +18,10 @@ public class UserController {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello from Mhetre's Kitchen backend!";
+    }
 
     @PostMapping
     public User createUser(@RequestBody User user) {
