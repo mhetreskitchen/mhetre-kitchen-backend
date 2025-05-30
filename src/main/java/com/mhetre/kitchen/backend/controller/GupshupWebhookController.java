@@ -2,6 +2,7 @@ package com.mhetre.kitchen.backend.controller;
 
 import com.mhetre.kitchen.backend.service.WhatsAppService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,16 @@ public class GupshupWebhookController {
     private WhatsAppService whatsAppService;
 
     // ✅ Real Gupshup POST webhook (used in production)
-    @PostMapping("/incoming")
+    @PostMapping(value = "/incoming", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<String> receiveMessagePost(@RequestParam Map<String, String> body) {
+        System.out.println("GUPSHUP BODY = " + body);
+
         String phone = body.get("source");
         String message = body.get("message");
 
         if (phone != null && message != null) {
-            String reply = whatsAppService.handleIncomingMessage(phone, message);
-            return ResponseEntity.ok(reply);  // Return chatbot reply here
+            whatsAppService.handleIncomingMessage(phone, message);
+            return ResponseEntity.ok("received");
         }
 
         return ResponseEntity.badRequest().body("Invalid request");
