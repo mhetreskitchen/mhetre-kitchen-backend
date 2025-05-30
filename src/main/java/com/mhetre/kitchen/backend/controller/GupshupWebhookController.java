@@ -20,18 +20,19 @@ public class GupshupWebhookController {
 
     // ✅ Real Gupshup POST webhook (used in production)
     @PostMapping(value = "/incoming", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<String> receiveMessagePost(@RequestParam Map<String, String> body) {
-        System.out.println("GUPSHUP BODY = " + body);
+    public ResponseEntity<String> receiveMessagePost(@RequestParam Map<String, String> params) {
+        System.out.println("=== Incoming Gupshup Webhook ===");
+        params.forEach((key, value) -> System.out.println(key + " = " + value));
 
-        String phone = body.get("source");
-        String message = body.get("message");
+        String phone = params.get("source");
+        String message = params.get("message");
 
         if (phone != null && message != null) {
             whatsAppService.handleIncomingMessage(phone, message);
             return ResponseEntity.ok("received");
         }
 
-        return ResponseEntity.badRequest().body("Invalid request");
+        return ResponseEntity.badRequest().body("Missing required params");
     }
 
     @GetMapping("/incoming")
