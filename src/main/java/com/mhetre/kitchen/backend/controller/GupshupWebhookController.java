@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 @RestController
 public class GupshupWebhookController {
-    @GetMapping("/webhook")
+    @PostMapping("/webhook")
     public ResponseEntity<String> receiveMessage(@RequestBody String payload) {
         System.out.println("Received from Gupshup: " + payload);
         // Parse JSON, handle message
