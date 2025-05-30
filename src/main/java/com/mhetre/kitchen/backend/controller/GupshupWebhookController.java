@@ -19,11 +19,12 @@ public class GupshupWebhookController {
 
     // Gupshup usually sends form data or JSON, check your webhook settings
     @PostMapping("/incoming")
-    public ResponseEntity<String> receiveMessage(@RequestParam Map<String, String> body) {
-        // Extract phone and message from incoming webhook parameters
-
-        String phone = body.get("source");       // Gupshup field for sender phone number
-        String message = body.get("message");    // Message text sent by user
+    @GetMapping("/incoming")
+    public ResponseEntity<String> receiveMessageGet(@RequestParam("source") String phone,
+                                                    @RequestParam("message") String message) {
+        whatsAppService.handleIncomingMessage(phone, message);
+       // return ResponseEntity.ok("received");
+        // Message text sent by user
 
         if (phone != null && message != null) {
             // Handle the incoming message
@@ -34,5 +35,5 @@ public class GupshupWebhookController {
 
         return ResponseEntity.badRequest().body("Invalid request");
     }
-
 }
+
