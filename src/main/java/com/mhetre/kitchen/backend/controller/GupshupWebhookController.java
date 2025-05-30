@@ -19,31 +19,68 @@ public class GupshupWebhookController {
     private static final String TEMPLATE_NAME = "welcome_template_name"; // replace with your template's exact name from Gupshup dashboard
 
     @PostMapping("/webhook")
+
     public ResponseEntity<String> receiveMessage(@RequestBody Map<String, Object> payload) {
         try {
-            // Log full payload
             System.out.println("Received JSON: " + payload);
 
-            Map<String, Object> outerPayload = (Map<String, Object>) payload.get("payload");
-            Map<String, Object> innerPayload = (Map<String, Object>) outerPayload.get("payload");
+            // Check if "entry" is present and is a list
+            var entryList = (java.util.List<Map<String, Object>>) payload.get("entry");
+            if (entryList == null || entryList.isEmpty()) {
+                System.out.println("No entry found in payload");
+                return ResponseEntity.ok("no entry");
+            }
 
-            String messageText = (String) innerPayload.get("text");
-            Map<String, Object> sender = (Map<String, Object>) innerPayload.get("sender");
-            String userPhone = (String) sender.get("phone");
+            // Iterate over entries (usually only one)
+            for (Map<String, Object> entry : entryList) {
+                var changesList = (java.util.List<Map<String, Object>>) entry.get("changes");
+                if (changesList == null || changesList.isEmpty()) {
+                    System.out.println("No changes found in entry");
+                    continue;
+                }
 
-            System.out.println("User " + userPhone + " said: " + messageText);
+                for (Map<String, Object> change : changesList) {
+                    String field = (String) change.get("field");
+                    Map<String, Object> value = (Map<String, Object>) change.get("value");
+                    if ("messages".equals(field) && value != null) {
+                        // Check if the payload has 'messages' or 'statuses'
+                        if (value.containsKey("messages")) {
+                            var messages = (java.util.List<Map<String, Object>>) value.get("messages");
+                            if (messages != null && !messages.isEmpty()) {
+                                Map<String, Object> message = messages.get(0);
+                                String messageText = null;
+                                if ("text".equals(message.get("type"))) {
+                                    Map<String, Object> textObj = (Map<String, Object>) message.get("text");
+                                    messageText = (String) textObj.get("body");
+                                }
+                                Map<String, Object> sender = (Map<String, Object>) message.get("from"); // or other sender key
+                                String userPhone = (String) message.get("from"); // or adapt to correct key
+                                System.out.println("User " + userPhone + " said: " + messageText);
 
-            // For demo, we will fill the template param with user phone number (or you can extract name if available)
-            String userName = userPhone; // Or parse user name if you have it
-
-            sendTemplateMessage(userPhone, userName);
-
+                                // Process user message and send a reply
+                                if (messageText != null) {
+                                    String reply = "Hi! You said: " + messageText;
+                                    sendTemplateMessage(userPhone, reply);
+                                }
+                            }
+                        } else if (value.containsKey("statuses")) {
+                            var statuses = (java.util.List<Map<String, Object>>) value.get("statuses");
+                            if (statuses != null && !statuses.isEmpty()) {
+                                Map<String, Object> status = statuses.get(0);
+                                String statusString = (String) status.get("status");
+                                System.out.println("Received status update: " + statusString);
+                                // handle statuses if needed
+                            }
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return ResponseEntity.ok("ok");
     }
+
 
     private void sendTemplateMessage(String toPhone, String param1) {
         try {
