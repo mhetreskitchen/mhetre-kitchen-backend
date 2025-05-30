@@ -1,13 +1,12 @@
 package com.mhetre.kitchen.backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@RequestMapping("/users")
 @RestController
 public class GupshupWebhookController {
-    @PostMapping("/webhook")
+    @GetMapping("/webhook")
     public ResponseEntity<String> receiveMessage(@RequestBody String payload) {
         System.out.println("Received from Gupshup: " + payload);
         // Parse JSON, handle message
