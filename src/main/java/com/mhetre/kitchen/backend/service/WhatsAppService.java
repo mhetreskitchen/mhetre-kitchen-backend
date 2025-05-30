@@ -95,15 +95,15 @@ public class WhatsAppService {
         String url = "https://api.gupshup.io/sm/api/v1/msg";
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", "YOUR_GUPSHUP_API_KEY");
+        headers.set("apikey", "sk_b924fbe6ae544afb99d3ed65ad008377");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("channel", "whatsapp");
-        params.add("source", "YOUR_GUPSHUP_NUMBER");
+        params.add("source", "917834811114");
         params.add("destination", phone);
         params.add("message", message);
-        params.add("src.name", "YOUR_GUPSHUP_APP_NAME");
+        params.add("src.name", "Mhetreskitchen");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         restTemplate.postForEntity(url, request, String.class);
