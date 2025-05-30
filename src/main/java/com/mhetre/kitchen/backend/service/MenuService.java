@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import java.util.Optional;
-
+@Service
 public class MenuService {
 
     private final MenuRepository menuRepository;
