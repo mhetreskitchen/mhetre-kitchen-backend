@@ -15,7 +15,8 @@ public class GupshupWebhookController {
 
     private static final String GUPSHUP_API_URL = "https://api.gupshup.io/wa/api/v1/msg";
     private static final String GUPSHUP_API_KEY = "sk_b924fbe6ae544afb99d3ed65ad008377"; // replace with your key
-    private static final String GUPSHUP_SOURCE = "917834811114"; // e.g., 918888888888
+    private static final String GUPSHUP_SOURCE = "917834811114"; // your Gupshup sandbox or number
+    private static final String TEMPLATE_NAME = "welcome_template_name"; // replace with your template's exact name from Gupshup dashboard
 
     @PostMapping("/webhook")
     public ResponseEntity<String> receiveMessage(@RequestBody Map<String, Object> payload) {
@@ -23,7 +24,6 @@ public class GupshupWebhookController {
             // Log full payload
             System.out.println("Received JSON: " + payload);
 
-            // Navigate through nested payload
             Map<String, Object> outerPayload = (Map<String, Object>) payload.get("payload");
             Map<String, Object> innerPayload = (Map<String, Object>) outerPayload.get("payload");
 
@@ -33,9 +33,10 @@ public class GupshupWebhookController {
 
             System.out.println("User " + userPhone + " said: " + messageText);
 
-            // Process user message and send a reply
-            String reply = "Hi! You said: " + messageText;
-            sendReply(userPhone, reply);
+            // For demo, we will fill the template param with user phone number (or you can extract name if available)
+            String userName = userPhone; // Or parse user name if you have it
+
+            sendTemplateMessage(userPhone, userName);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,11 +45,24 @@ public class GupshupWebhookController {
         return ResponseEntity.ok("ok");
     }
 
-    private void sendReply(String toPhone, String messageText) {
+    private void sendTemplateMessage(String toPhone, String param1) {
         try {
             String json = String.format(
-                    "{\"channel\":\"whatsapp\",\"source\":\"%s\",\"destination\":\"%s\",\"message\":{\"type\":\"text\",\"text\":\"%s\"}}",
-                    GUPSHUP_SOURCE, toPhone, messageText.replace("\"", "\\\"")
+                    """
+                    {
+                      "channel": "whatsapp",
+                      "source": "%s",
+                      "destination": "%s",
+                      "message": {
+                        "type": "template",
+                        "template": {
+                          "name": "%s",
+                          "params": ["%s"]
+                        }
+                      }
+                    }
+                    """,
+                    GUPSHUP_SOURCE, toPhone, TEMPLATE_NAME, param1.replace("\"", "\\\"")
             );
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -61,7 +75,7 @@ public class GupshupWebhookController {
             HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Reply sent. Gupshup response: " + response.body());
+            System.out.println("Template message sent. Gupshup response: " + response.body());
         } catch (Exception e) {
             e.printStackTrace();
         }
