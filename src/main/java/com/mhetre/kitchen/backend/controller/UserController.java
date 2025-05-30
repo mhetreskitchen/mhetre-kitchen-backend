@@ -5,7 +5,9 @@ import com.mhetre.kitchen.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -20,7 +22,9 @@ public class UserController {
     }
     @GetMapping("/hello")
     public String sayHello() {
-        return "Hello from Mhetre's Kitchen backend!";
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Hello from Mhetre's Kitchen backend!");
+        return response.toString();
     }
 
     @PostMapping
