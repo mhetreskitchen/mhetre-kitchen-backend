@@ -17,23 +17,25 @@ public class GupshupWebhookController {
     @Autowired
     private WhatsAppService whatsAppService;
 
-    // Gupshup usually sends form data or JSON, check your webhook settings
+    // ✅ Real Gupshup POST webhook (used in production)
     @PostMapping("/incoming")
-    @GetMapping("/incoming")
-    public ResponseEntity<String> receiveMessageGet(@RequestParam("source") String phone,
-                                                    @RequestParam("message") String message) {
-        whatsAppService.handleIncomingMessage(phone, message);
-       // return ResponseEntity.ok("received");
-        // Message text sent by user
+    public ResponseEntity<String> receiveMessagePost(@RequestParam Map<String, String> body) {
+        String phone = body.get("source");
+        String message = body.get("message");
 
         if (phone != null && message != null) {
-            // Handle the incoming message
             whatsAppService.handleIncomingMessage(phone, message);
-            // Respond to Gupshup with 200 OK (empty or "received")
             return ResponseEntity.ok("received");
         }
 
         return ResponseEntity.badRequest().body("Invalid request");
     }
-}
 
+    // ✅ Temporary GET support for testing via browser
+    @GetMapping("/incoming")
+    public ResponseEntity<String> receiveMessageGet(@RequestParam("source") String phone,
+                                                    @RequestParam("message") String message) {
+        whatsAppService.handleIncomingMessage(phone, message);
+        return ResponseEntity.ok("received");
+    }
+}
