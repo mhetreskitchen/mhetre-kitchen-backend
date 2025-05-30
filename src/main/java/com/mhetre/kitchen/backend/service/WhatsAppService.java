@@ -21,7 +21,7 @@ public class WhatsAppService {
     @Autowired
     private OrderService orderService;
 
-    public void handleIncomingMessage(String phone, String message) {
+    public String handleIncomingMessage(String phone, String message) {
         UserSession session = sessionService.getOrCreateSession(phone);
         String reply;
 
@@ -52,8 +52,13 @@ public class WhatsAppService {
         }
 
         sessionService.saveSession(session);
-        sendMessage(phone, reply);
+
+        // Optionally, you can still send the message asynchronously via WhatsApp API if needed
+        // sendMessage(phone, reply);
+
+        return reply;  // Return reply string instead of void
     }
+
 
     private String processMainCommands(String msg, UserSession session) {
         msg = msg.toLowerCase();

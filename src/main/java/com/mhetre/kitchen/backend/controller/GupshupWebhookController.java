@@ -24,18 +24,18 @@ public class GupshupWebhookController {
         String message = body.get("message");
 
         if (phone != null && message != null) {
-            whatsAppService.handleIncomingMessage(phone, message);
-            return ResponseEntity.ok("received");
+            String reply = whatsAppService.handleIncomingMessage(phone, message);
+            return ResponseEntity.ok(reply);  // Return chatbot reply here
         }
 
         return ResponseEntity.badRequest().body("Invalid request");
     }
 
-    // ✅ Temporary GET support for testing via browser
     @GetMapping("/incoming")
     public ResponseEntity<String> receiveMessageGet(@RequestParam("source") String phone,
                                                     @RequestParam("message") String message) {
-        whatsAppService.handleIncomingMessage(phone, message);
-        return ResponseEntity.ok("received");
+        String reply = whatsAppService.handleIncomingMessage(phone, message);
+        return ResponseEntity.ok(reply);  // Return chatbot reply here
     }
+
 }
