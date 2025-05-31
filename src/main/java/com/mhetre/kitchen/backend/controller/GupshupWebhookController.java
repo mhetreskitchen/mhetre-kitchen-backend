@@ -6,12 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.List;
 import java.util.Map;
+
 @RestController
 public class GupshupWebhookController {
 
@@ -32,14 +28,16 @@ public class GupshupWebhookController {
             return ResponseEntity.ok("received");
         }
 
-        return ResponseEntity.badRequest().body("Missing required params");
+        return ResponseEntity.badRequest().body("❌ Missing required parameters: source and message");
     }
 
+    // ✅ GET endpoint for browser/manual testing
     @GetMapping("/incoming")
-    public ResponseEntity<String> receiveMessageGet(@RequestParam("source") String phone,
-                                                    @RequestParam("message") String message) {
-        String reply = whatsAppService.handleIncomingMessage(phone, message);
-        return ResponseEntity.ok(reply);  // Return chatbot reply here
-    }
+    public ResponseEntity<String> receiveMessageGet(
+            @RequestParam(value = "source", defaultValue = "test-user") String phone,
+            @RequestParam(value = "message", defaultValue = "hi") String message) {
 
+        String reply = whatsAppService.handleIncomingMessage(phone, message);
+        return ResponseEntity.ok(reply);  // Return chatbot reply
+    }
 }
